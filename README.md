@@ -70,6 +70,10 @@ MIT
 
 ## ChangeLog
 
+### v1.0.5
+
+- Add secp256k to BSON mock
+
 ### v1.0.4
 
 - Add BSON mock
