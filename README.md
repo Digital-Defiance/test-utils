@@ -70,6 +70,10 @@ MIT
 
 ## ChangeLog
 
+### v1.0.3
+
+- Add jest global declaration for toThrowType
+
 ### v1.0.2
 
 - Add LocalStorageMock
