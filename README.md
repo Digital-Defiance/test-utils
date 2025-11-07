@@ -70,6 +70,10 @@ MIT
 
 ## ChangeLog
 
+### v1.0.1
+
+- Bugfix release, fixing lack of js files in tarball
+
 ### v1.0.0
 
 - Initial Release
