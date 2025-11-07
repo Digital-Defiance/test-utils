@@ -70,6 +70,10 @@ MIT
 
 ## ChangeLog
 
+### v1.0.4
+
+- Add BSON mock
+
 ### v1.0.3
 
 - Add jest global declaration for toThrowType
