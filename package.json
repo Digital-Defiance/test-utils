@@ -1,0 +1,45 @@
+{
+  "name": "@digitaldefiance/express-suite-test-utils",
+  "version": "1.0.0",
+  "description": "Test utilities for Digital Defiance Express Suite",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "scripts": {
+    "build": "npx nx build digitaldefiance-express-suite-test-utils && npx nx run digitaldefiance-express-suite-test-utils:postbuild",
+    "build:stream": "npx nx build --outputStyle=stream digitaldefiance-express-suite-test-utils",
+    "build:logged": "npx nx build --outputStyle=stream digitaldefiance-express-suite-test-utils 2>&1 | ansifilter -o build.log",
+    "test": "npx nx test digitaldefiance-express-suite-test-utils",
+    "test:stream": "npx nx test --outputStyle=stream digitaldefiance-express-suite-test-utils",
+    "test:logged": "npx nx test --outputStyle=stream digitaldefiance-express-suite-test-utils 2>&1 | ansifilter -o test.log",
+    "test:coverage": "npx jest --coverage --testPathPattern=digitaldefiance-express-suite-test-utils --coverageReporters=text",
+    "lint": "npx nx lint digitaldefiance-express-suite-test-utils",
+    "lint:fix": "npx nx lint digitaldefiance-express-suite-test-utils --fix",
+    "prettier:check": "prettier --check 'src/**/*.{ts,tsx}'",
+    "prettier:fix": "prettier --write 'src/**/*.{ts,tsx}'",
+    "format": "npx nx format:write --projects=digitaldefiance-express-suite-test-utils",
+    "format:check": "npx nx format:check --projects=digitaldefiance-express-suite-test-utils",
+    "prepublishOnly": "npx nx build digitaldefiance-express-suite-test-utils",
+    "publish:public": "npm publish --access public"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "keywords": [
+    "test",
+    "jest",
+    "typescript",
+    "utilities"
+  ],
+  "author": "Digital Defiance, Jessica Mulein",
+  "license": "MIT",
+  "packageManager": "yarn@4.10.3",
+  "dependencies": {
+    "@jest/globals": "^30.0.5",
+    "@types/jest": "^30.0.0",
+    "expect": "^30.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0"
+  }
+}
