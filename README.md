@@ -14,16 +14,22 @@ yarn add @digitaldefiance/express-suite-test-utils
 
 ## Usage
 
-### Importing Test Utilities from node-express-suite
+### Importing Test Utilities from Express Suite Packages
 
-Test helpers and mocks from `@digitaldefiance/node-express-suite` are available via a separate entry point:
+Test helpers and mocks are available via separate `/testing` entry points:
 
 ```typescript
+// node-express-suite test helpers
 import { 
-  mockFunctions,
-  setupTestEnv,
-  // ... other test helpers
+  createApplicationMock,
+  setupTestEnv
 } from '@digitaldefiance/node-express-suite/testing';
+
+// node-ecies-lib test mocks
+import { mockBackendMember } from '@digitaldefiance/node-ecies-lib/testing';
+
+// ecies-lib test mocks
+import { mockFrontendMember } from '@digitaldefiance/ecies-lib/testing';
 
 // Use in your tests
 beforeAll(async () => {
@@ -31,7 +37,7 @@ beforeAll(async () => {
 });
 ```
 
-**Note:** These utilities require `@faker-js/faker` as a peer dependency:
+**Note:** All `/testing` entry points require `@faker-js/faker` as a peer dependency:
 
 ```bash
 npm install -D @faker-js/faker
