@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/express-suite-test-utils",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Test utilities for Digital Defiance Express Suite",
   "main": "src/index.js",
   "types": "src/index.d.ts",

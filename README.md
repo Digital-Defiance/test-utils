@@ -2,6 +2,8 @@
 
 Test utilities for Digital Defiance Express Suite projects.
 
+Part of [Express Suite](https://github.com/Digital-Defiance/express-suite)
+
 ## Installation
 
 ```bash
@@ -11,6 +13,31 @@ yarn add @digitaldefiance/express-suite-test-utils
 ```
 
 ## Usage
+
+### Importing Test Utilities from node-express-suite
+
+Test helpers and mocks from `@digitaldefiance/node-express-suite` are available via a separate entry point:
+
+```typescript
+import { 
+  mockFunctions,
+  setupTestEnv,
+  // ... other test helpers
+} from '@digitaldefiance/node-express-suite/testing';
+
+// Use in your tests
+beforeAll(async () => {
+  await setupTestEnv();
+});
+```
+
+**Note:** These utilities require `@faker-js/faker` as a peer dependency:
+
+```bash
+npm install -D @faker-js/faker
+# or
+yarn add -D @faker-js/faker
+```
 
 ### toThrowType Matcher
 
