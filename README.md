@@ -103,6 +103,10 @@ MIT
 
 ## ChangeLog
 
+### v1.0.8
+
+- Add directLog mocks
+
 ### v1.0.6
 
 - Add react mocks
