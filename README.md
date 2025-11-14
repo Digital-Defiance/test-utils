@@ -97,11 +97,78 @@ it('should log message', async () => {
 });
 ```
 
+### Direct Log Mocks
+
+Mock `fs.writeSync` for testing direct console output:
+
+```typescript
+import { withDirectLogMocks, directLogContains, getDirectLogMessages } from '@digitaldefiance/express-suite-test-utils';
+import * as fs from 'fs';
+
+// Important: Mock fs module at module level before importing
+jest.mock('fs', () => ({
+  ...jest.requireActual('fs'),
+  writeSync: jest.fn(),
+}));
+
+it('should capture direct writes to stdout', async () => {
+  await withDirectLogMocks({ mute: true }, async (spies) => {
+    const buffer = Buffer.from('hello world\n', 'utf8');
+    fs.writeSync(1, buffer); // stdout
+    
+    expect(directLogContains(spies.writeSync, 1, 'hello', 'world')).toBe(true);
+    expect(getDirectLogMessages(spies.writeSync, 1)).toEqual(['hello world\n']);
+  });
+});
+```
+
+### Mongoose Memory Database
+
+In-memory MongoDB testing utilities using mongodb-memory-server:
+
+```typescript
+import { connectMemoryDB, disconnectMemoryDB, clearMemoryDB } from '@digitaldefiance/express-suite-test-utils';
+import { User } from './models/user';
+
+describe('User model', () => {
+  beforeAll(async () => {
+    await connectMemoryDB();
+  });
+
+  afterAll(async () => {
+    await disconnectMemoryDB();
+  });
+
+  afterEach(async () => {
+    await clearMemoryDB();
+  });
+
+  it('should validate user schema', async () => {
+    const user = new User({ username: 'test', email: 'test@example.com' });
+    await user.validate(); // Real Mongoose validation!
+    
+    await expect(async () => {
+      const invalid = new User({ username: 'ab' }); // too short
+      await invalid.validate();
+    }).rejects.toThrow();
+  });
+});
+```
+
+**Note:** Requires `mongoose` as a peer dependency and `mongodb-memory-server` as a dependency (already included).
+
 ## License
 
 MIT
 
 ## ChangeLog
+
+### v1.0.10
+
+- Fix direct-log mocks to work with non-configurable fs.writeSync in newer Node.js versions
+- Add comprehensive mongoose memory database testing utilities
+- Fix memory mongoose connectMemoryDB
+
 
 ### v1.0.9
 

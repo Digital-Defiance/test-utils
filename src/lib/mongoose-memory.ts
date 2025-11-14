@@ -6,19 +6,30 @@ let connection: Connection | undefined;
 
 /**
  * Connect to in-memory MongoDB for testing
+ * @returns Object with both the connection and URI
  */
-export async function connectMemoryDB(): Promise<Connection> {
-  if (connection && connection.readyState === 1) {
-    return connection;
+export async function connectMemoryDB(): Promise<{ connection: Connection; uri: string }> {
+  // If mongoose is connected but we don't have our server, disconnect first
+  if (mongoose.connection.readyState !== 0 && !mongoServer) {
+    await mongoose.disconnect();
+    connection = undefined;
   }
 
-  mongoServer = await MongoMemoryServer.create();
+  // Create new server if needed
+  if (!mongoServer) {
+    mongoServer = await MongoMemoryServer.create();
+  }
+  
   const uri = mongoServer.getUri();
   
-  await mongoose.connect(uri);
+  // Connect if not already connected
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(uri);
+  }
+  
   connection = mongoose.connection;
   
-  return connection;
+  return { connection, uri };
 }
 
 /**
