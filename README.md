@@ -103,6 +103,10 @@ MIT
 
 ## ChangeLog
 
+### v1.0.9
+
+- Add mongoose memory helpers
+
 ### v1.0.8
 
 - Add directLog mocks

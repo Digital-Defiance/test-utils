@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/express-suite-test-utils",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Test utilities for Digital Defiance Express Suite",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -37,9 +37,14 @@
   "dependencies": {
     "@jest/globals": "^30.0.5",
     "@types/jest": "^30.0.0",
-    "expect": "^30.0.5"
+    "expect": "^30.0.5",
+    "mongodb-memory-server": "^10.1.3"
+  },
+  "peerDependencies": {
+    "mongoose": "^8.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "mongoose": "^8.9.3"
   }
 }

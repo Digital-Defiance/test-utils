@@ -4,3 +4,4 @@ export * from './lib/direct-log';
 export * from './lib/localStorage-mock';
 export * from './lib/bson-mock';
 export * from './lib/react-mocks';
+export * from './lib/mongoose-memory';

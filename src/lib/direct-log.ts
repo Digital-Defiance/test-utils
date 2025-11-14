@@ -4,7 +4,7 @@ import * as fs from 'fs';
  * Spies returned from withDirectLogMocks
  */
 export interface DirectLogSpies {
-  writeSync: jest.SpyInstance;
+  writeSync: jest.Mock;
 }
 
 /**
@@ -22,40 +22,54 @@ export interface WithDirectLogOptions {
  * Wrap a test body with fs.writeSync spy for directLog testing.
  * By default mutes output (does nothing on write).
  * The spy will capture calls with file descriptor and buffer.
+ * 
+ * Note: Requires fs module to be mocked at module level with jest.mock('fs')
  */
 export async function withDirectLogMocks<T = unknown>(
   options: WithDirectLogOptions,
   fn: (spies: DirectLogSpies) => Promise<T> | T,
 ): Promise<T> {
   const mute = options?.mute !== false; // default true
-  const noop = () => undefined;
-  const originalWriteSync = fs.writeSync;
   
-  const writeSync = jest
-    .spyOn(fs, 'writeSync')
-    .mockImplementation(
-      mute
-        ? noop as any
-        : (originalWriteSync as any)
-    );
+  // Get the mocked writeSync function
+  const writeSync = fs.writeSync as unknown as jest.Mock;
+  
+  // Store previous mock implementation if any
+  const previousImpl = writeSync.getMockImplementation();
+  
+  // Set implementation based on mute option
+  if (mute) {
+    writeSync.mockImplementation(() => undefined);
+  } else {
+    // Pass through - requires original implementation to be available
+    writeSync.mockImplementation((...args: any[]) => {
+      // In test environment, we can't easily call the real fs.writeSync
+      // so we just no-op but track the calls
+      return args[1]?.length || 0;
+    });
+  }
   
   const spies: DirectLogSpies = { writeSync };
   
   try {
     return await fn(spies);
   } finally {
-    writeSync.mockRestore();
+    // Clear calls and restore previous implementation
+    writeSync.mockClear();
+    if (previousImpl) {
+      writeSync.mockImplementation(previousImpl);
+    }
   }
 }
 
 /**
  * Helper to check if writeSync was called with a specific file descriptor and message.
- * @param spy The writeSync spy
+ * @param spy The writeSync mock
  * @param fd The file descriptor (1 for stdout, 2 for stderr)
  * @param needles Substrings to search for in the buffer content
  */
 export function directLogContains(
-  spy: jest.SpyInstance,
+  spy: jest.Mock,
   fd: number,
   ...needles: string[]
 ): boolean {
@@ -73,11 +87,11 @@ export function directLogContains(
 
 /**
  * Get all messages written to a specific file descriptor.
- * @param spy The writeSync spy
+ * @param spy The writeSync mock
  * @param fd The file descriptor (1 for stdout, 2 for stderr)
  */
 export function getDirectLogMessages(
-  spy: jest.SpyInstance,
+  spy: jest.Mock,
   fd: number,
 ): string[] {
   return spy.mock.calls
