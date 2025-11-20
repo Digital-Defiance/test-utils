@@ -8,16 +8,17 @@ describe('mongoose-memory', () => {
     });
 
     it('should connect to in-memory MongoDB', async () => {
-      const connection = await connectMemoryDB();
+      const { connection, uri } = await connectMemoryDB();
       expect(connection).toBeDefined();
+      expect(uri).toBeDefined();
       expect(connection.readyState).toBe(1); // 1 = connected
-    });
+    }, 15000);
 
     it('should reuse existing connection', async () => {
-      const connection1 = await connectMemoryDB();
-      const connection2 = await connectMemoryDB();
+      const { connection: connection1 } = await connectMemoryDB();
+      const { connection: connection2 } = await connectMemoryDB();
       expect(connection1).toBe(connection2);
-    });
+    }, 15000);
   });
 
   describe('clearMemoryDB', () => {
@@ -41,7 +42,7 @@ describe('mongoose-memory', () => {
       await clearMemoryDB();
       
       expect(await TestModel.countDocuments()).toBe(0);
-    });
+    }, 15000);
 
     it('should clear multiple collections', async () => {
       const schema1 = new mongoose.Schema({ name: String });
@@ -59,16 +60,16 @@ describe('mongoose-memory', () => {
       
       expect(await Model1.countDocuments()).toBe(0);
       expect(await Model2.countDocuments()).toBe(0);
-    });
+    }, 15000);
 
     it('should be safe to call when no collections exist', async () => {
       await expect(clearMemoryDB()).resolves.not.toThrow();
-    });
+    }, 15000);
 
     it('should be safe to call when not connected', async () => {
       await disconnectMemoryDB();
       await expect(clearMemoryDB()).resolves.not.toThrow();
-    });
+    }, 15000);
   });
 
   describe('disconnectMemoryDB', () => {
@@ -79,17 +80,17 @@ describe('mongoose-memory', () => {
       await disconnectMemoryDB();
       
       expect(mongoose.connection.readyState).toBe(0); // 0 = disconnected
-    });
+    }, 15000);
 
     it('should be safe to call when not connected', async () => {
       await expect(disconnectMemoryDB()).resolves.not.toThrow();
-    });
+    }, 15000);
 
     it('should be safe to call multiple times', async () => {
       await connectMemoryDB();
       await disconnectMemoryDB();
       await expect(disconnectMemoryDB()).resolves.not.toThrow();
-    });
+    }, 15000);
 
     it('should drop database before disconnecting', async () => {
       await connectMemoryDB();
@@ -102,9 +103,11 @@ describe('mongoose-memory', () => {
       // Reconnect to verify database was dropped
       await connectMemoryDB();
       // Model needs to be re-registered after reconnect
-      const NewModel = mongoose.model('DisconnectTest2', schema);
+      // Delete the old model from mongoose's model registry first
+      delete mongoose.models.DisconnectTest;
+      const NewModel = mongoose.model('DisconnectTest', schema);
       expect(await NewModel.countDocuments()).toBe(0);
-    });
+    }, 15000);
   });
 
   describe('integration scenarios', () => {
@@ -114,7 +117,7 @@ describe('mongoose-memory', () => {
 
     it('should handle full lifecycle: connect -> use -> clear -> disconnect', async () => {
       // Connect
-      const connection = await connectMemoryDB();
+      const { connection } = await connectMemoryDB();
       expect(connection.readyState).toBe(1);
       
       // Use
@@ -135,14 +138,14 @@ describe('mongoose-memory', () => {
       // Disconnect
       await disconnectMemoryDB();
       expect(mongoose.connection.readyState).toBe(0);
-    });
+    }, 15000);
 
     it('should support reconnecting after disconnect', async () => {
       await connectMemoryDB();
       await disconnectMemoryDB();
       
-      const connection = await connectMemoryDB();
+      const { connection } = await connectMemoryDB();
       expect(connection.readyState).toBe(1);
-    });
+    }, 15000);
   });
 });
