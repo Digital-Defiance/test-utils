@@ -1,5 +1,9 @@
-import { connectMemoryDB, disconnectMemoryDB, clearMemoryDB } from '../src/lib/mongoose-memory';
-import mongoose from 'mongoose';
+import mongoose from '@digitaldefiance/mongoose-types';
+import {
+  clearMemoryDB,
+  connectMemoryDB,
+  disconnectMemoryDB,
+} from '../src/lib/mongoose-memory';
 
 describe('mongoose-memory', () => {
   describe('connectMemoryDB', () => {
@@ -33,14 +37,14 @@ describe('mongoose-memory', () => {
     it('should clear all collections', async () => {
       const schema = new mongoose.Schema({ name: String });
       const TestModel = mongoose.model('ClearTest', schema);
-      
+
       await TestModel.create({ name: 'test1' });
       await TestModel.create({ name: 'test2' });
-      
+
       expect(await TestModel.countDocuments()).toBe(2);
-      
+
       await clearMemoryDB();
-      
+
       expect(await TestModel.countDocuments()).toBe(0);
     }, 15000);
 
@@ -49,15 +53,15 @@ describe('mongoose-memory', () => {
       const schema2 = new mongoose.Schema({ value: Number });
       const Model1 = mongoose.model('ClearMulti1', schema1);
       const Model2 = mongoose.model('ClearMulti2', schema2);
-      
+
       await Model1.create({ name: 'test' });
       await Model2.create({ value: 42 });
-      
+
       expect(await Model1.countDocuments()).toBe(1);
       expect(await Model2.countDocuments()).toBe(1);
-      
+
       await clearMemoryDB();
-      
+
       expect(await Model1.countDocuments()).toBe(0);
       expect(await Model2.countDocuments()).toBe(0);
     }, 15000);
@@ -76,9 +80,9 @@ describe('mongoose-memory', () => {
     it('should disconnect and clean up', async () => {
       await connectMemoryDB();
       expect(mongoose.connection.readyState).toBe(1);
-      
+
       await disconnectMemoryDB();
-      
+
       expect(mongoose.connection.readyState).toBe(0); // 0 = disconnected
     }, 15000);
 
@@ -97,9 +101,9 @@ describe('mongoose-memory', () => {
       const schema = new mongoose.Schema({ name: String });
       const TestModel = mongoose.model('DisconnectTest', schema);
       await TestModel.create({ name: 'test' });
-      
+
       await disconnectMemoryDB();
-      
+
       // Reconnect to verify database was dropped
       await connectMemoryDB();
       // Model needs to be re-registered after reconnect
@@ -119,22 +123,22 @@ describe('mongoose-memory', () => {
       // Connect
       const { connection } = await connectMemoryDB();
       expect(connection.readyState).toBe(1);
-      
+
       // Use
       const schema = new mongoose.Schema({ value: Number });
       const Model = mongoose.model('LifecycleTest', schema);
       await Model.create({ value: 1 });
       await Model.create({ value: 2 });
       expect(await Model.countDocuments()).toBe(2);
-      
+
       // Clear
       await clearMemoryDB();
       expect(await Model.countDocuments()).toBe(0);
-      
+
       // Can still use after clear
       await Model.create({ value: 3 });
       expect(await Model.countDocuments()).toBe(1);
-      
+
       // Disconnect
       await disconnectMemoryDB();
       expect(mongoose.connection.readyState).toBe(0);
@@ -143,7 +147,7 @@ describe('mongoose-memory', () => {
     it('should support reconnecting after disconnect', async () => {
       await connectMemoryDB();
       await disconnectMemoryDB();
-      
+
       const { connection } = await connectMemoryDB();
       expect(connection.readyState).toBe(1);
     }, 15000);

@@ -157,11 +157,193 @@ describe('User model', () => {
 
 **Note:** Requires `mongoose` as a peer dependency and `mongodb-memory-server` as a dependency (already included).
 
+## Testing Approach
+
+This package provides comprehensive testing utilities for Express Suite projects, including custom Jest matchers, console mocks, database helpers, and more.
+
+### Test Utilities Overview
+
+**Custom Matchers**: `toThrowType` for type-safe error testing  
+**Console Mocks**: Mock and spy on console methods  
+**Direct Log Mocks**: Mock `fs.writeSync` for stdout/stderr testing  
+**Database Helpers**: MongoDB Memory Server integration  
+**React Mocks**: Mock React components and hooks
+
+### Usage Patterns
+
+#### Using toThrowType Matcher
+
+```typescript
+import '@digitaldefiance/express-suite-test-utils';
+
+class CustomError extends Error {
+  constructor(public code: number) {
+    super('Custom error');
+  }
+}
+
+describe('Error Testing', () => {
+  it('should throw specific error type', () => {
+    expect(() => {
+      throw new CustomError(404);
+    }).toThrowType(CustomError);
+  });
+
+  it('should validate error properties', () => {
+    expect(() => {
+      throw new CustomError(404);
+    }).toThrowType(CustomError, (error) => {
+      expect(error.code).toBe(404);
+    });
+  });
+});
+```
+
+#### Using Console Mocks
+
+```typescript
+import { withConsoleMocks, spyContains } from '@digitaldefiance/express-suite-test-utils';
+
+describe('Console Output', () => {
+  it('should capture console.log', async () => {
+    await withConsoleMocks({ mute: true }, async (spies) => {
+      console.log('test message');
+      
+      expect(spies.log).toHaveBeenCalledWith('test message');
+      expect(spyContains(spies.log, 'test', 'message')).toBe(true);
+    });
+  });
+
+  it('should capture console.error', async () => {
+    await withConsoleMocks({ mute: true }, async (spies) => {
+      console.error('error message');
+      
+      expect(spies.error).toHaveBeenCalledWith('error message');
+    });
+  });
+});
+```
+
+#### Using Direct Log Mocks
+
+```typescript
+import { withDirectLogMocks, directLogContains, getDirectLogMessages } from '@digitaldefiance/express-suite-test-utils';
+import * as fs from 'fs';
+
+// Mock fs at module level
+jest.mock('fs', () => ({
+  ...jest.requireActual('fs'),
+  writeSync: jest.fn(),
+}));
+
+describe('Direct Logging', () => {
+  it('should capture stdout writes', async () => {
+    await withDirectLogMocks({ mute: true }, async (spies) => {
+      const buffer = Buffer.from('hello world\n', 'utf8');
+      fs.writeSync(1, buffer); // stdout
+      
+      expect(directLogContains(spies.writeSync, 1, 'hello', 'world')).toBe(true);
+      expect(getDirectLogMessages(spies.writeSync, 1)).toEqual(['hello world\n']);
+    });
+  });
+});
+```
+
+#### Using MongoDB Memory Server
+
+```typescript
+import { connectMemoryDB, disconnectMemoryDB, clearMemoryDB } from '@digitaldefiance/express-suite-test-utils';
+import { User } from './models/user';
+
+describe('Database Tests', () => {
+  beforeAll(async () => {
+    await connectMemoryDB();
+  });
+
+  afterAll(async () => {
+    await disconnectMemoryDB();
+  });
+
+  afterEach(async () => {
+    await clearMemoryDB();
+  });
+
+  it('should validate user schema', async () => {
+    const user = new User({ 
+      username: 'test', 
+      email: 'test@example.com' 
+    });
+    
+    await user.validate(); // Real Mongoose validation!
+    await user.save();
+    
+    const found = await User.findOne({ username: 'test' });
+    expect(found).toBeDefined();
+  });
+
+  it('should reject invalid data', async () => {
+    const invalid = new User({ username: 'ab' }); // too short
+    
+    await expect(invalid.validate()).rejects.toThrow();
+  });
+});
+```
+
+### Testing Best Practices
+
+1. **Always clean up** after tests (disconnect DB, restore mocks)
+2. **Use memory database** for fast, isolated tests
+3. **Mock external dependencies** to avoid side effects
+4. **Test error conditions** with `toThrowType` matcher
+5. **Capture console output** when testing logging behavior
+
+### Cross-Package Testing
+
+These utilities are designed to work seamlessly with all Express Suite packages:
+
+```typescript
+import { connectMemoryDB, disconnectMemoryDB } from '@digitaldefiance/express-suite-test-utils';
+import { Application } from '@digitaldefiance/node-express-suite';
+import { UserService } from '@digitaldefiance/node-express-suite';
+
+describe('Integration Tests', () => {
+  let app: Application;
+
+  beforeAll(async () => {
+    await connectMemoryDB();
+    app = new Application({
+      mongoUri: global.__MONGO_URI__,
+      jwtSecret: 'test-secret'
+    });
+  });
+
+  afterAll(async () => {
+    await app.stop();
+    await disconnectMemoryDB();
+  });
+
+  it('should create and find user', async () => {
+    const userService = new UserService(app);
+    const user = await userService.create({
+      username: 'alice',
+      email: 'alice@example.com'
+    });
+    
+    const found = await userService.findByUsername('alice');
+    expect(found).toBeDefined();
+  });
+});
+```
+
 ## License
 
 MIT
 
 ## ChangeLog
+
+### v1.0.11
+
+- Fix mongoose to use @digitaldefiance/mongoose-types
 
 ### v1.0.10
 

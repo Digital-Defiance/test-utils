@@ -1,5 +1,5 @@
+import mongoose, { Connection } from '@digitaldefiance/mongoose-types';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import mongoose, { Connection } from 'mongoose';
 
 let mongoServer: MongoMemoryServer | undefined;
 let connection: Connection | undefined;
@@ -8,7 +8,10 @@ let connection: Connection | undefined;
  * Connect to in-memory MongoDB for testing
  * @returns Object with both the connection and URI
  */
-export async function connectMemoryDB(): Promise<{ connection: Connection; uri: string }> {
+export async function connectMemoryDB(): Promise<{
+  connection: Connection;
+  uri: string;
+}> {
   // If mongoose is connected but we don't have our server, disconnect first
   if (mongoose.connection.readyState !== 0 && !mongoServer) {
     await mongoose.disconnect();
@@ -19,16 +22,16 @@ export async function connectMemoryDB(): Promise<{ connection: Connection; uri: 
   if (!mongoServer) {
     mongoServer = await MongoMemoryServer.create();
   }
-  
+
   const uri = mongoServer.getUri();
-  
+
   // Connect if not already connected
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(uri);
   }
-  
+
   connection = mongoose.connection;
-  
+
   return { connection, uri };
 }
 
@@ -41,7 +44,7 @@ export async function disconnectMemoryDB(): Promise<void> {
     await mongoose.disconnect();
     connection = undefined;
   }
-  
+
   if (mongoServer) {
     await mongoServer.stop();
     mongoServer = undefined;
