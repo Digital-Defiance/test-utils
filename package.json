@@ -1,6 +1,11 @@
 {
   "name": "@digitaldefiance/express-suite-test-utils",
-  "version": "1.0.11",
+  "version": "1.0.12",
+  "homepage": "https://github.com/Digital-Defiance/test-utils",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Digital-Defiance/test-utils.git"
+  },
   "description": "Test utilities for Digital Defiance Express Suite",
   "main": "src/index.js",
   "types": "src/index.d.ts",
