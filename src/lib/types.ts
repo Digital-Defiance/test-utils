@@ -3,12 +3,13 @@
 export {};
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       toThrowType<E extends Error, T extends new (...args: any[]) => E>(
         errorType: T,
-        validator?: (error: E) => void,
+        validator?: (error: E) => void
       ): R;
     }
   }
@@ -22,10 +23,8 @@ declare module 'expect' {
         this: jest.MatcherContext,
         received: () => unknown,
         errorType: T,
-        validator?: (error: E) => void,
+        validator?: (error: E) => void
       ): jest.CustomMatcherResult;
     };
   }
 }
-
-

@@ -6,11 +6,12 @@ import { readFileSync } from 'fs';
 export type ErrorClass<E extends Error> = new (...args: any[]) => E;
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
       toThrowType<E extends Error>(
         errorType: ErrorClass<E>,
-        validator?: (error: E) => void,
+        validator?: (error: E) => void
       ): R;
     }
   }
@@ -30,7 +31,7 @@ function isMatcherError(error: unknown): error is MatcherError {
 function extractTestInfo(stackTrace: string) {
   const stackLines = stackTrace.split('\n');
   const anonymousLine = stackLines.find((line) =>
-    line.includes('Object.<anonymous>'),
+    line.includes('Object.<anonymous>')
   );
   const match = anonymousLine?.match(/\((.+?\.spec\.ts):(\d+):(\d+)\)/);
 
@@ -70,7 +71,7 @@ export const toThrowType = async function <E extends Error>(
   this: MatcherContext,
   received: (() => unknown | Promise<unknown>) | Promise<unknown>,
   errorType: ErrorClass<E>,
-  validator?: (error: E) => void,
+  validator?: (error: E) => void
 ): Promise<{ pass: boolean; message: () => string }> {
   const matcherName = 'toThrowType';
   const options = {
@@ -103,7 +104,7 @@ export const toThrowType = async function <E extends Error>(
         throw new Error(
           this.utils.matcherHint(matcherName, undefined, undefined, options) +
             '\n\n' +
-            'Received value must be a function',
+            'Received value must be a function'
         );
       }
       try {
@@ -135,7 +136,7 @@ export const toThrowType = async function <E extends Error>(
       diffString =
         this.utils.diff(
           error.matcherResult.expected,
-          error.matcherResult.received,
+          error.matcherResult.received
         ) || '';
     } else {
       diffString = this.utils.diff('Error to match assertions', message) || '';
@@ -147,7 +148,7 @@ export const toThrowType = async function <E extends Error>(
       pass: false,
       message: () =>
         `\n\n${this.utils.RECEIVED_COLOR(
-          `● ${testHierarchy.join(' › ')}${location ? ` ${location}` : ''}`,
+          `● ${testHierarchy.join(' › ')}${location ? ` ${location}` : ''}`
         )}\n\n` +
         this.utils.matcherHint(matcherName, undefined, undefined, options) +
         '\n\n' +
@@ -164,7 +165,7 @@ export const toThrowType = async function <E extends Error>(
       ? (() => {
           const { testHierarchy, location } = extractTestInfo(error.stack);
           return `\n\n${this.utils.RECEIVED_COLOR(
-            `● ${testHierarchy.join(' › ')}${location}`,
+            `● ${testHierarchy.join(' › ')}${location}`
           )}\n\n`;
         })()
       : '\n';
@@ -177,22 +178,22 @@ export const toThrowType = async function <E extends Error>(
       '\n\n' +
       (pass
         ? `Expected function not to throw ${this.utils.printExpected(
-            errorType.name,
+            errorType.name
           )}`
         : this.promise
         ? this.utils.matcherErrorMessage(
             this.utils.matcherHint(matcherName, undefined, undefined, options),
             'Expected promise to reject',
-            'Promise resolved successfully',
+            'Promise resolved successfully'
           )
         : this.utils.matcherErrorMessage(
             this.utils.matcherHint(matcherName, undefined, undefined, options),
             `Expected function to throw ${this.utils.printExpected(
-              errorType.name,
+              errorType.name
             )}`,
             `Received: ${this.utils.printReceived(
-              error instanceof Error ? error.constructor.name : typeof error,
-            )}`,
+              error instanceof Error ? error.constructor.name : typeof error
+            )}`
           )),
   };
 };

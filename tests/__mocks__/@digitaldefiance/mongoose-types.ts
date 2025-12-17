@@ -6,6 +6,12 @@
  * This mock bypasses Jest's module system by directly requiring mongoose,
  * which ensures the getters are properly evaluated.
  */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const path = require('path');
 const mongoosePath = path.dirname(require.resolve('mongoose/package.json'));
 const mongoose = require(mongoosePath);

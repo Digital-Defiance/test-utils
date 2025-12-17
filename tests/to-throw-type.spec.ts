@@ -37,12 +37,10 @@ describe('toThrowType', () => {
   });
 
   it('should handle promise rejection', async () => {
-    await expect(Promise.reject(new CustomError(404))).rejects.toThrow(CustomError);
+    await expect(Promise.reject(new CustomError(404))).rejects.toThrow(
+      CustomError
+    );
   });
-
-
-
-
 
   it('should handle isNot flag', () => {
     expect(() => {
@@ -52,11 +50,9 @@ describe('toThrowType', () => {
 
   it('should handle error without stack', () => {
     const errorWithoutStack = new CustomError(404);
-    delete (errorWithoutStack as any).stack;
+    delete (errorWithoutStack as Error & { stack?: string }).stack;
     expect(() => {
       throw errorWithoutStack;
     }).toThrowType(CustomError);
   });
-
-
 });

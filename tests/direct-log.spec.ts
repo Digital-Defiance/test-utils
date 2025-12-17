@@ -1,12 +1,12 @@
 import {
-  withDirectLogMocks,
   directLogContains,
   getDirectLogMessages,
+  withDirectLogMocks,
 } from '../src/lib/direct-log';
 
 // Mock fs module at the module level
 jest.mock('fs', () => {
-  const actualFs = jest.requireActual('fs');
+  const actualFs = jest.requireActual<typeof import('fs')>('fs');
   return {
     ...actualFs,
     writeSync: jest.fn(),
@@ -27,7 +27,7 @@ describe('direct-log mocks', () => {
       await withDirectLogMocks({ mute: true }, async (spies) => {
         const buffer1 = Buffer.from('stdout message\n', 'utf8');
         const buffer2 = Buffer.from('stderr message\n', 'utf8');
-        
+
         mockWriteSync(1, buffer1);
         mockWriteSync(2, buffer2);
 
@@ -46,9 +46,8 @@ describe('direct-log mocks', () => {
     });
 
     it('should restore writeSync after execution', async () => {
-      let capturedMock: any;
-      await withDirectLogMocks({ mute: true }, async (spies) => {
-        capturedMock = spies.writeSync;
+      await withDirectLogMocks({ mute: true }, async () => {
+        // Mock is captured internally
       });
       // Mock should be cleared after execution
       expect(mockWriteSync.mock.calls.length).toBe(0);
@@ -99,7 +98,7 @@ describe('direct-log mocks', () => {
         const buffer = Buffer.from('hello world test\n', 'utf8');
         mockWriteSync(1, buffer);
         expect(directLogContains(spies.writeSync, 1, 'hello', 'world')).toBe(
-          true,
+          true
         );
       });
     });
@@ -117,7 +116,7 @@ describe('direct-log mocks', () => {
         const buffer = Buffer.from('hello world\n', 'utf8');
         mockWriteSync(1, buffer);
         expect(directLogContains(spies.writeSync, 1, 'hello', 'missing')).toBe(
-          false,
+          false
         );
       });
     });
@@ -142,7 +141,7 @@ describe('direct-log mocks', () => {
 
     it('should handle string buffers', async () => {
       await withDirectLogMocks({ mute: true }, async (spies) => {
-        mockWriteSync(1, 'string message\n' as any);
+        mockWriteSync(1, 'string message\n');
         expect(directLogContains(spies.writeSync, 1, 'string')).toBe(true);
       });
     });
@@ -154,7 +153,7 @@ describe('direct-log mocks', () => {
     });
 
     it('should handle mixed file descriptors', async () => {
-      await withDirectLogMocks({ mute: true}, async (spies) => {
+      await withDirectLogMocks({ mute: true }, async (spies) => {
         const buffer1 = Buffer.from('stdout\n', 'utf8');
         const buffer2 = Buffer.from('stderr\n', 'utf8');
         mockWriteSync(1, buffer1);
@@ -209,7 +208,7 @@ describe('direct-log mocks', () => {
 
     it('should handle string buffers', async () => {
       await withDirectLogMocks({ mute: true }, async (spies) => {
-        mockWriteSync(1, 'string message\n' as any);
+        mockWriteSync(1, 'string message\n');
 
         const messages = getDirectLogMessages(spies.writeSync, 1);
         expect(messages).toEqual(['string message\n']);
