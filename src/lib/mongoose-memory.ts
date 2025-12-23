@@ -20,7 +20,12 @@ export async function connectMemoryDB(): Promise<{
 
   // Create new server if needed
   if (!mongoServer) {
-    mongoServer = await MongoMemoryServer.create();
+    mongoServer = await MongoMemoryServer.create({
+      instance: {
+        // Increase timeout for slow CI environments
+        launchTimeout: 60000,
+      },
+    });
   }
 
   const uri = mongoServer.getUri();
