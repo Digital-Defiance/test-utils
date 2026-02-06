@@ -49,13 +49,13 @@
     "mongoose": "^8.0.0"
   },
   "peerDependenciesMeta": {
-    "@digitaldefiance/suite-core-lib": {
-      "optional": true
-    },
     "@digitaldefiance/ecies-lib": {
       "optional": true
     },
     "@digitaldefiance/node-ecies-lib": {
+      "optional": true
+    },
+    "@digitaldefiance/suite-core-lib": {
       "optional": true
     }
   },

@@ -297,6 +297,45 @@ describe('Database Tests', () => {
 4. **Test error conditions** with `toThrowType` matcher
 5. **Capture console output** when testing logging behavior
 
+### i18n Test Setup
+
+Initialize i18n engines for testing error messages and translations:
+
+```typescript
+import { setupI18nForTests } from '@digitaldefiance/express-suite-test-utils';
+
+describe('Service Tests', () => {
+  let cleanupI18n: () => void;
+
+  beforeAll(() => {
+    // Initializes all available i18n engines (suite-core, ecies, node-ecies)
+    cleanupI18n = setupI18nForTests();
+  });
+
+  afterAll(() => {
+    cleanupI18n();
+  });
+
+  it('should throw translated error', async () => {
+    // Error classes now have i18n translations available
+    await expect(service.doSomething()).rejects.toBeInstanceOf(SomeError);
+  });
+});
+```
+
+For selective initialization:
+
+```typescript
+import { setupSpecificI18nForTests } from '@digitaldefiance/express-suite-test-utils';
+
+beforeAll(() => {
+  // Only initialize specific engines
+  cleanupI18n = setupSpecificI18nForTests(['suite-core', 'ecies']);
+});
+```
+
+**Note:** This helper dynamically loads i18n libraries if available. No hard dependencies are required - it gracefully skips any libraries not installed in your project.
+
 ### Cross-Package Testing
 
 These utilities are designed to work seamlessly with all Express Suite packages:
@@ -340,6 +379,12 @@ describe('Integration Tests', () => {
 MIT
 
 ## ChangeLog
+
+### v1.1.0
+
+- Add `setupI18nForTests()` helper for initializing i18n engines in tests
+- Add `setupSpecificI18nForTests()` for selective engine initialization
+- Uses dynamic loading to avoid dependency cycles
 
 ### v1.0.11
 
