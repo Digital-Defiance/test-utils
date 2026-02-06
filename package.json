@@ -1,6 +1,6 @@
 {
   "name": "@digitaldefiance/express-suite-test-utils",
-  "version": "1.0.14",
+  "version": "1.1.0",
   "homepage": "https://github.com/Digital-Defiance/test-utils",
   "repository": {
     "type": "git",
@@ -47,6 +47,17 @@
   },
   "peerDependencies": {
     "mongoose": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@digitaldefiance/suite-core-lib": {
+      "optional": true
+    },
+    "@digitaldefiance/ecies-lib": {
+      "optional": true
+    },
+    "@digitaldefiance/node-ecies-lib": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
