@@ -11,10 +11,27 @@ module.exports = {
     '^.+\\.(ts|tsx)$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tsconfig.spec.json',
+        tsconfig: {
+          ...require('./tsconfig.spec.json').compilerOptions,
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+        },
+      },
+    ],
+    '^.+\\.(js|jsx)$': [
+      '@swc/jest',
+      {
+        jsc: {
+          parser: { syntax: 'ecmascript' },
+          target: 'es2020',
+        },
+        module: { type: 'commonjs' },
       },
     ],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@faker-js|@noble|@scure|@ethereumjs|uuid))',
+  ],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
     prefix: '<rootDir>/../../',
   }),
